@@ -56,7 +56,9 @@
   - state: map of values that are updated only when a prime is found--grouped
     together to prevent re-branching.
       - search-space: a vector of booleans describing whether the number
-        at each index is potentially a prime
+        at each index is potentially a prime. The sieve iterates through this
+        list, adding primes to `primes` and flipping the flags of the prime's
+        multiples in `search-space` when it encounters a `true` value.
       - primes: list of found primes
       - prime-count: self-explanatory. re-running the count function for
         every number in the search space can be costly later on
