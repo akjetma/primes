@@ -28,10 +28,14 @@
   - this function gives 16,441,302 for the upper bound
   - there are 955,439 numbers between the prime and the bound
   - there are 57,661 primes in that space
+  - the benefit of using the bounded sieve rather than the naiive 
+    implementation outweighs the penalty of the larger search space.
   
   does not work for primes 2-11 (first 5 primes).
+  
+  using the bounded sieve vs. naiive implementation 
 
-  cargo-culted from https://www.maa.org/sites/default/files/jaroma03200545640.pdf"
+  source: https://www.maa.org/sites/default/files/jaroma03200545640.pdf"
   [num-primes]
   (if (< num-primes 6) 
     12
