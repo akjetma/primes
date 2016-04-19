@@ -18,7 +18,7 @@
       (println "prime count: " (count v))
       (println "last prime: " (last v)))))
 
-;; ---------------- slow implementation of bounded erastosthenes sieve
+;; --------------------- implementation of bounded erastosthenes sieve
 
 (defn upper-bound
   "rough upper bound for the nth prime. 
