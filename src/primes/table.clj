@@ -52,6 +52,9 @@
   (concat [prefix] coll))
 
 (defn attach-labels
+  "adds the row of column labels to the top of the table, and row labels
+  if present. if row labels are present, adds the necessary empty cell to 
+  the column headers as well."
   ([table col-labels]
    (prepend col-labels table))
   ([table col-labels row-labels]
@@ -72,6 +75,7 @@
        (string/join "+")))
 
 (defn attach-separators
+  "interleave elements defining the gride lines of the table."
   [table]
   (let [hr (horizontal-rule
             (cell-size table)
@@ -94,6 +98,9 @@
     table)))
 
 (def make-table 
+  ;; parameters: table (the data/inside of the table), 
+  ;;             column-labels (they go on top),
+  ;;             row-labels (they go on the side)         
   (comp table-str 
         attach-separators
         pad-cells

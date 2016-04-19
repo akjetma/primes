@@ -58,10 +58,10 @@
     together to prevent re-branching.
       - search-space: a vector of booleans describing whether the number
         at each index is potentially a prime. The sieve iterates through this
-        list, adding primes to `primes` and flipping the flags of the primes'
-        multiples in `search-space` to `false` when it encounters `true`. the
-        definition of a prime number in this program is the sieve encountering
-        `true` in the search space.
+        list, adding the indices of `true`s to `primes` and flipping the flags 
+        of the prime's multiples in `search-space` to `false`. the definition 
+        of a prime number in this program is the sieve (given valid initial input) 
+        encountering `true` in the search-space at the current index of `search`.
       - primes: list of found primes
       - prime-count: self-explanatory. re-running the count function for
         every number in the search space can be costly later on
@@ -71,7 +71,7 @@
     was expensive
   - search: the number being checked for primality."
   [{:as state :keys [search-space primes prime-count]}
-   prime-limit search-limit search]   
+   prime-limit search-limit search]
   (if (or (= prime-count prime-limit) 
           (= search search-limit)) 
     primes
