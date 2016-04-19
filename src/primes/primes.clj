@@ -51,7 +51,20 @@
    search-space
    (range search search-limit search)))
 
-(defn sieve  
+(defn sieve
+  "Description of parameters:
+  - state: map of values that are updated only when a prime is found--grouped
+    together to prevent re-branching.
+      - search-space: a vector of booleans describing whether the number
+        at each index is potentially a prime
+      - primes: list of found primes
+      - prime-count: self-explanatory. re-running the count function for
+        every number in the search space can be costly later on
+  - prime-limit: the number of primes requested. prevents us from searching
+    extraneous values after we have found enough primes
+  - search-limit: the size of search-space vector. repeatedly recounting 
+    was expensive
+  - search: the number being checked for primality."
   [{:as state :keys [search-space primes prime-count]}
    prime-limit search-limit search]   
   (if (or (= prime-count prime-limit) 
@@ -66,13 +79,13 @@
       (recur next-state prime-limit search-limit (inc search)))))
 
 (defn generate
-  "sets up data for sieve function"
+  "returns a list of `num-primes` primes"
   [num-primes]
   (when (pos? num-primes)
     (let [search-size (upper-bound num-primes)]
-      (sieve {:search-space (vec (repeat search-size true))
+      (sieve {:search-space (vec (repeat search-size true)) 
               :primes []
               :prime-count 0}
-             num-primes        ;; prime-limit
-             search-size       ;; search-limit
-             2))))              ;; search (number being checked)
+             num-primes
+             search-size
+             2))))
