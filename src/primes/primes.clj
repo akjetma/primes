@@ -32,8 +32,6 @@
     implementation outweighs the penalty of the larger search space.
   
   does not work for primes 2-11 (first 5 primes).
-  
-  using the bounded sieve vs. naiive implementation 
 
   source: https://www.maa.org/sites/default/files/jaroma03200545640.pdf"
   [num-primes]
