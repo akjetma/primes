@@ -46,10 +46,11 @@
   false means 'not a prime'"
   [search-space search-limit search]
   (reduce
-   (fn [numbers composite]
-     (assoc numbers composite false))
+   (fn [possible number]
+     (assoc possible number false))
    search-space
-   (range search search-limit search)))
+   (range search search-limit search))) ;; multiples of the prime from 
+                                        ;; the prime to end of the search space
 
 (defn sieve
   "Description of parameters:
@@ -57,8 +58,10 @@
     together to prevent re-branching.
       - search-space: a vector of booleans describing whether the number
         at each index is potentially a prime. The sieve iterates through this
-        list, adding primes to `primes` and flipping the flags of the prime's
-        multiples in `search-space` when it encounters a `true` value.
+        list, adding primes to `primes` and flipping the flags of the primes'
+        multiples in `search-space` to `false` when it encounters `true`. the
+        definition of a prime number in this program is the sieve encountering
+        `true` in the search space.
       - primes: list of found primes
       - prime-count: self-explanatory. re-running the count function for
         every number in the search space can be costly later on
@@ -73,8 +76,8 @@
           (= search search-limit)) 
     primes
     (let [next-state 
-          (if (get search-space search)
-            {:search-space (set-composites search-space search-limit search)
+          (if (get search-space search) ;; the number is prime
+            {:search-space (set-composites search-space search-limit search) ;; its multiples are not prime
              :primes (conj primes search)
              :prime-count (inc prime-count)}
             state)]
