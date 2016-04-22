@@ -18,22 +18,9 @@
       (println "prime count: " (count v))
       (println "last prime: " (last v)))))
 
-;; --------------------- implementation of bounded erastosthenes sieve
+;; ----------------------------------------- upper bound for nth prime
 
 (defn upper-bound
-  "rough upper bound for the nth prime. 
-
-  for example, 
-  - the millionth prime is 15,485,863
-  - this function gives 16,441,302 for the upper bound
-  - there are 955,439 numbers between the prime and the bound
-  - there are 57,661 primes in that space
-  - the benefit of using the bounded sieve rather than the naiive 
-    implementation outweighs the penalty of the larger search space.
-  
-  does not work for primes 2-11 (first 5 primes).
-
-  source: https://www.maa.org/sites/default/files/jaroma03200545640.pdf"
   [num-primes]
   (if (< num-primes 6) 
     12
@@ -41,56 +28,60 @@
      (+ (* num-primes (Math/log num-primes)) 
         (* num-primes (Math/log (Math/log num-primes)))))))
 
+;; --------------------------------- performed when sieve hits a prime
+
+(defn multiples
+  [of to]
+  (let [from (* 2 of)]
+    (range from to of)))
+
 (defn set-composites
-  "flag the multiples of a number in the search-space.
-  false means 'not a prime'"
-  [search-space search-limit search]
+  [search-space composites]
   (reduce
-   (fn [possible number]
-     (assoc possible number false))
+   #(assoc %1 %2 false)
    search-space
-   (range search search-limit search))) ;; multiples of the prime from 
-                                        ;; the prime to end of the search space
+   composites))
+
+(defn new-prime
+  [{:keys [search search-limit] :as state}]
+  (-> state
+      (update :search-space set-composites (multiples search search-limit))
+      (update :primes conj search)
+      (update :prime-count inc)
+      (update :search inc)))
+
+;; -------------- performed for every composite until all primes found
+
+(defn no-prime
+  [state]
+  (update state :search inc))
+
+(defn prime?
+  [{:keys [search-space search]}]
+  (get search-space search))
+
+(defn stop?
+  [{:keys [prime-count prime-limit search-limit search]}]
+  (or (= prime-count prime-limit) 
+      (= search search-limit)))
+
+;; ----------------------------------------------------------- process
 
 (defn sieve
-  "Description of parameters:
-  - state: map of values that are updated only when a prime is found--grouped
-    together to prevent re-branching.
-      - search-space: a vector of booleans describing whether the number
-        at each index is potentially a prime. The sieve iterates through this
-        list, adding the indices of `true`s to `primes` and flipping the flags 
-        of the prime's multiples in `search-space` to `false`. the definition 
-        of a prime number in this program is the sieve (given valid initial input) 
-        encountering `true` in the search-space at the current index of `search`.
-      - primes: list of found primes
-      - prime-count: self-explanatory. re-running the count function for
-        every number in the search space can be costly later on
-  - prime-limit: the number of primes requested. prevents us from searching
-    extraneous values after we have found enough primes
-  - search-limit: the size of search-space vector. repeatedly recounting 
-    was expensive
-  - search: the number being checked for primality."
-  [{:as state :keys [search-space primes prime-count]}
-   prime-limit search-limit search]
-  (if (or (= prime-count prime-limit) 
-          (= search search-limit)) 
-    primes
-    (let [next-state 
-          (if (get search-space search) ;; the number is prime
-            {:search-space (set-composites search-space search-limit search) ;; its multiples are not prime
-             :primes (conj primes search)
-             :prime-count (inc prime-count)}
-            state)]
-      (recur next-state prime-limit search-limit (inc search)))))
+  [state]
+  (if (stop? state)
+    (:primes state)
+    (recur (if (prime? state) 
+             (new-prime state) 
+             (no-prime state)))))
 
 (defn generate
-  "returns a list of `num-primes` primes"
   [num-primes]
   (when (pos? num-primes)
     (let [search-size (upper-bound num-primes)]
       (sieve {:search-space (vec (repeat search-size true)) 
               :primes []
-              :prime-count 0}
-             num-primes
-             search-size
-             2))))
+              :prime-count 0
+              :prime-limit num-primes
+              :search-limit search-size
+              :search 2}))))
